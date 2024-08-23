@@ -29,13 +29,25 @@ public class RoleImplement implements RoleService {
         if (!roleRepository.existsByName(roleRequest.getRoles())) throw new AppException(ErrorCode.ROLE_NOT_FOUND);
         Optional<Role> role = roleRepository.findById(roleRequest.getRoles());
 
-
         Set<Role> roleA = account.getRoles();
         for (Role role1 : roleA){
             if (role1 == role.get()) throw new AppException(ErrorCode.ROLE_IS_EXIST);
         }
         roleA.add(role.get());
+        account.setRoles(roleA);
         accountRepository.save(account);
 
+    }
+
+    @Override
+    public void deletedRole(RoleRequest roleRequest) {
+        Account account = accountRepository.findAccountById(roleRequest.getId());
+        if (account == null) throw new AppException(ErrorCode.ACCOUNT_NOT_FOUND);
+        if (!roleRepository.existsByName(roleRequest.getRoles())) throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+        Optional<Role> role = roleRepository.findById(roleRequest.getRoles());
+        Set<Role> roleA = account.getRoles();
+        roleA.remove(role.get());
+        account.setRoles(roleA);
+        accountRepository.save(account);
     }
 }

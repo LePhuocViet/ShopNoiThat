@@ -22,4 +22,11 @@ public class RoleController {
         roleService.updateRole(roleRequest);
         return ApiResponses.<String>builder().result("success").build();
     }
+
+    @PostMapping("/deleted")
+    ApiResponses<String> deletedRole(@RequestBody RoleRequest roleRequest){
+        roleService.deletedRole(roleRequest);
+        return ApiResponses.<String>builder().result("success").build();
+    }
+
 }
