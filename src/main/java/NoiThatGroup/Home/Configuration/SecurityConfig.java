@@ -24,8 +24,9 @@ public class SecurityConfig {
 
     @NonFinal
     protected static final String SIGNER_KEY="630F20D84D4187F778E537CD0AE9582D0DB5DA98057668461651A928F3E3A0CF6C1E205D3A8B7E24BB767357DFAF39C264EA";
-    private String[] PUBLIC_ENPOINT={"/users","/auth/login","/auth/verify","/auth/refresh"};
-    private String[] USER_ENPOINT={"/auth/send","/auth/logout","/auth/introspect","/account/myinf","/users/update"};
+    private String[] PUBLIC_ENPOINT={"/users","/auth/login","/auth/refresh","/auth/forgot","/auth/send"};
+    private String[] PUBLIC_ENPOINT_GET={"/auth/verify","/auth/change"};
+    private String[] USER_ENPOINT={"/auth/logout","/auth/introspect","/account/myinf","/users/update"};
     private String[] ADMIN_ENPOINT={"/accounts","/accounts/search","/accounts/active","/accounts/deleted","/roles/update" +
             "/roles/deleted"};
     @Autowired
@@ -34,6 +35,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
             request .requestMatchers(HttpMethod.POST,PUBLIC_ENPOINT).permitAll()
+                    .requestMatchers(HttpMethod.GET,PUBLIC_ENPOINT_GET).permitAll()
                     .requestMatchers(ADMIN_ENPOINT).hasRole("ADMIN")
                     .requestMatchers(USER_ENPOINT).hasRole("USER")
                     .anyRequest().authenticated());

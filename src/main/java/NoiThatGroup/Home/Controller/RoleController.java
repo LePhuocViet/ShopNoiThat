@@ -6,10 +6,7 @@ import NoiThatGroup.Home.Dto.respone.ApiResponses;
 import NoiThatGroup.Home.Enity.Role;
 import NoiThatGroup.Home.Service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/roles")
@@ -17,13 +14,13 @@ public class RoleController {
 
     @Autowired
     RoleService roleService;
-    @PostMapping("/update")
+    @PutMapping("/update")
     ApiResponses<String> updateRole(@RequestBody RoleRequest roleRequest){
         roleService.updateRole(roleRequest);
         return ApiResponses.<String>builder().result("success").build();
     }
 
-    @PostMapping("/deleted")
+    @DeleteMapping("/deleted")
     ApiResponses<String> deletedRole(@RequestBody RoleRequest roleRequest){
         roleService.deletedRole(roleRequest);
         return ApiResponses.<String>builder().result("success").build();

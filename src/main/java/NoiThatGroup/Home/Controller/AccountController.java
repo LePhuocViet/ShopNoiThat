@@ -42,7 +42,7 @@ public class AccountController {
                 .build();
     }
 
-    @PostMapping("/deleted")
+    @DeleteMapping("/deleted")
     ApiResponses<String> deletedAccount(@RequestBody IdRequest id){
         accountService.deletedAccountById(id.getId());
         return ApiResponses.<String>builder().result("success").build();
@@ -54,6 +54,9 @@ public class AccountController {
                 .result(accountService.getMyInf())
                 .build();
     }
+
+
+
 
 
 

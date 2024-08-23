@@ -1,6 +1,7 @@
 package NoiThatGroup.Home.Service.Implement;
 
 import NoiThatGroup.Home.Dto.request.EmailRequest;
+import NoiThatGroup.Home.Dto.request.PasswordRequest;
 import NoiThatGroup.Home.Enity.Account;
 import NoiThatGroup.Home.Enity.EmailSender;
 import NoiThatGroup.Home.Enity.User;
@@ -27,10 +28,7 @@ import org.springframework.util.CollectionUtils;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Optional;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.*;
 
 @Service
@@ -52,11 +50,10 @@ public class EmailImplement implements EmailService {
     protected static final String SIGNER_KEY="630F20D84D4187F778E537CD0AE9582D0DB5DA98057668461651A928F3E3A0CF6C1E205D3A8B7E24BB767357DFAF39C264EA";
 
     @Override
-    public void sendMail(EmailRequest emailRequest) throws JOSEException, ParseException {
+    public boolean sendMail(EmailRequest emailRequest) throws JOSEException, ParseException {
         if(!verifyToken(emailRequest.getToken())){
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
-
 
         SignedJWT signedJWT = SignedJWT.parse(emailRequest.getToken());
         var username = signedJWT.getJWTClaimsSet().getSubject();
@@ -89,17 +86,19 @@ public class EmailImplement implements EmailService {
         };
         scheduledExecutorService.schedule(deletedEmail,5,TimeUnit.MINUTES);
         scheduledExecutorService.shutdown();
-
         emailRepository.save(emailSender);
         javaMailSender.send(simpleMailMessage);
-
+        return true;
     }
 
     @Override
-    public void confirmEmail(EmailRequest emailRequest) throws ParseException, JOSEException {
+    public boolean confirmEmail(EmailRequest emailRequest) throws ParseException, JOSEException {
         var verify = verifyToken(emailRequest.getToken());
         if(!verify) throw new AppException(ErrorCode.UNAUTHORIZED);
         SignedJWT signedJWT = SignedJWT.parse(emailRequest.getToken());
+        JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
+        var object = jwtClaimsSet.getClaim("active");
+        if (object == null) throw new AppException(ErrorCode.UNAUTHORIZED);
         var account = accountRepository.findAccountByUsername(signedJWT.getJWTClaimsSet().getSubject());
         Optional<EmailSender> emailSender = emailRepository.findById(account.getId());
         if(emailSender.isEmpty()) throw new AppException(ErrorCode.CODE_EXPIRED);
@@ -107,10 +106,67 @@ public class EmailImplement implements EmailService {
         account.setActive(true);
         accountRepository.save(account);
         emailRepository.delete(emailSender.get());
-
+        return true;
 
     }
 
+    @Override
+    public boolean sendMailPassword(PasswordRequest passwordRequest) throws ParseException, JOSEException {
+        if (!userRepository.existsByEmail(passwordRequest.getEmail())) throw new AppException(ErrorCode.EMAIL_NOT_FOUND);
+        User user = userRepository.findUserByEmail(passwordRequest.getEmail());
+        if (user == null) throw new AppException(ErrorCode.EMAIL_NOT_FOUND);
+        Account account = accountRepository.findAccountById(user.getAccount().getId());
+
+        if(account == null) throw new AppException(ErrorCode.ACCOUNT_NOT_FOUND);
+        var emailSend = emailRepository.findById(account.getId());
+        if(!emailSend.isEmpty()){
+            emailRepository.delete(emailSend.get());
+        }
+
+        var token = generalTokenEmailPassword(account.getUsername());
+
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setFrom("vietyts2003@gmail.com");
+        simpleMailMessage.setTo(user.getEmail());
+        simpleMailMessage.setSubject("Change Password NoiThatShop");
+        simpleMailMessage.setText("We received a request to change your password, please click on the link below to change your password\n" +
+                "If this is not you, please ignore this email \n" +
+                "The link will be valid for 5 minutes \n" +
+                "http://localhost:8080/auth/change?code="+token);
+        EmailSender emailSender = EmailSender.builder()
+                .id(account.getId())
+                .date(new Date())
+                .token(token)
+                .build();
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        Runnable deletedEmail = () -> {
+            emailRepository.delete(emailSender);
+        };
+        scheduledExecutorService.schedule(deletedEmail,5,TimeUnit.MINUTES);
+        scheduledExecutorService.shutdown();
+
+        emailRepository.save(emailSender);
+        javaMailSender.send(simpleMailMessage);
+        return true;
+    }
+
+    @Override
+    public boolean confirmMailPassword(EmailRequest emailRequest) throws ParseException, JOSEException {
+        var verify = verifyToken(emailRequest.getToken());
+        if(!verify) throw new AppException(ErrorCode.UNAUTHORIZED);
+        SignedJWT signedJWT = SignedJWT.parse(emailRequest.getToken());
+        JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
+        var object = jwtClaimsSet.getClaim("forgot");
+        if (object == null) throw new AppException(ErrorCode.UNAUTHORIZED);
+        var account = accountRepository.findAccountByUsername(signedJWT.getJWTClaimsSet().getSubject());
+        Optional<EmailSender> emailSender = emailRepository.findById(account.getId());
+        if(emailSender.isEmpty()) throw new AppException(ErrorCode.CODE_EXPIRED);
+        if (!emailRequest.getToken().equals(emailSender.get().getToken())) throw new AppException(ErrorCode.UNAUTHORIZED);
+        account.setActive(true);
+        accountRepository.save(account);
+        emailRepository.delete(emailSender.get());
+        return true;
+    }
 
 
     private boolean verifyToken(String token) throws JOSEException, ParseException {
@@ -130,6 +186,7 @@ public class EmailImplement implements EmailService {
         return true;
 
     }
+
     String generalTokenEmail(String username){
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
@@ -141,6 +198,32 @@ public class EmailImplement implements EmailService {
                         Instant.now().plus(5, ChronoUnit.MINUTES).toEpochMilli()
                 ))
                 .jwtID(UUID.randomUUID().toString())
+                .claim("active",1)
+                .build();
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+        JWSObject jwsObject = new JWSObject(jwsHeader,payload);
+
+        try {
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    String generalTokenEmailPassword(String username){
+        JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
+
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(username)
+                .issuer("NoiThat.Com")
+                .issueTime(new Date())
+                .expirationTime(new Date(
+                        Instant.now().plus(5, ChronoUnit.MINUTES).toEpochMilli()
+                ))
+                .jwtID(UUID.randomUUID().toString())
+                .claim("forgot",1)
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(jwsHeader,payload);

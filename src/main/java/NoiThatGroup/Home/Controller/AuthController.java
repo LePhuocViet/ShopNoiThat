@@ -2,6 +2,7 @@ package NoiThatGroup.Home.Controller;
 
 import NoiThatGroup.Home.Dto.request.AccountRequest;
 import NoiThatGroup.Home.Dto.request.EmailRequest;
+import NoiThatGroup.Home.Dto.request.PasswordRequest;
 import NoiThatGroup.Home.Dto.request.TokenRequest;
 import NoiThatGroup.Home.Dto.respone.ApiResponses;
 import NoiThatGroup.Home.Dto.respone.AuthenticationResponses;
@@ -57,19 +58,35 @@ public class AuthController {
     }
 
     @PostMapping("/send")
-    ApiResponses<String> sendEmail(@RequestBody EmailRequest emailRequest) throws ParseException, JOSEException {
-        emailService.sendMail(emailRequest);
-        return ApiResponses.<String>builder()
-                .result("success")
+    ApiResponses<Boolean> sendEmail(@RequestBody EmailRequest emailRequest) throws ParseException, JOSEException {
+        return ApiResponses.<Boolean>builder()
+                .result(emailService.sendMail(emailRequest))
                 .build();
 
     }
 
     @GetMapping("/verify")
-    ApiResponses<String> sendEmail(@RequestParam("code") String token) throws ParseException, JOSEException {
-        emailService.confirmEmail(new EmailRequest(token));
-        return ApiResponses.<String>builder()
-                .result("success")
+    ApiResponses<Boolean> confirm(@RequestParam("code") String token) throws ParseException, JOSEException {
+        System.out.println(1);
+        return ApiResponses.<Boolean>builder()
+                .result(emailService.confirmEmail(new EmailRequest(token)))
+                .build();
+
+    }
+    @PostMapping("/forgot")
+    ApiResponses<Boolean> sendEmailForgot(@RequestBody PasswordRequest passwordRequest) throws ParseException, JOSEException {
+
+        return ApiResponses.<Boolean>builder()
+                .result( emailService.sendMailPassword(passwordRequest))
+                .build();
+
+    }
+
+    @GetMapping("/change")
+    ApiResponses<Boolean> confirmMailPassword(@RequestParam("code") String token ) throws ParseException, JOSEException {
+
+        return ApiResponses.<Boolean>builder()
+                .result( emailService.confirmMailPassword(new EmailRequest(token)))
                 .build();
 
     }
