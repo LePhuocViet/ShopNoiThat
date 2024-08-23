@@ -8,6 +8,7 @@ public enum ErrorCode {
     USERNAME_IS_EXIST(400,"Username is exist"),
     USERNAME_OR_PASSWORD_WRONG(400,"Username or Password is wrong"),
     EMAIL_IS_EXIST(400,"Username is exist"),
+    ROLE_IS_EXIST(400,"Role is exist"),
     PASSWORD_NOT_MATCH(400,"Password not match"),
     USERNAME_INVALID(400,"Username needs to be between 5 and 18 characters."),
     PASSWORD_INVALID(400,"Password needs to be between 5 and 18 characters."),
@@ -21,6 +22,7 @@ public enum ErrorCode {
     EMAIL_NOT_FOUND(404,"Email not found"),
     ACCOUNT_NOT_FOUND(404,"Account not found"),
     USER_NOT_FOUND(404,"Account not found"),
+    ROLE_NOT_FOUND(404,"Role not found"),
     ITEM_NOT_FOUND(404,"Item not found")
 
 

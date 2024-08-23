@@ -6,6 +6,7 @@ import NoiThatGroup.Home.Dto.respone.ApiResponses;
 import NoiThatGroup.Home.Dto.respone.UserRespone;
 import NoiThatGroup.Home.Enity.Account;
 import NoiThatGroup.Home.Service.AccountService;
+import NoiThatGroup.Home.Service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Block;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,9 @@ import java.util.List;
 public class AccountController {
     @Autowired
     AccountService accountService;
+
+    @Autowired
+    RoleService roleService;
     @GetMapping
     ApiResponses<List<AccountResponses>> getAccount(){
         return ApiResponses.<List<AccountResponses>>builder()

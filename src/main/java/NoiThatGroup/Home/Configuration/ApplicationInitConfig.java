@@ -27,6 +27,7 @@ public class ApplicationInitConfig {
     @Bean
     ApplicationRunner applicationRunner(AccountRepository accountRepository, ShoppingRepository shoppingRepository, UserRepository userRepository, RoleRepository roleRepository) {
         return args -> {
+
             if (!accountRepository.existsByUsername("admin")) {
                 PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
                 var role = roleRepository.findById("ADMIN");
