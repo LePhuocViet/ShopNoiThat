@@ -28,7 +28,7 @@ public class SecurityConfig {
     private String[] PUBLIC_ENPOINT_GET={"/auth/verify","/auth/change"};
     private String[] USER_ENPOINT={"/auth/logout","/auth/introspect","/account/myinf","/users/update"};
     private String[] ADMIN_ENPOINT={"/accounts","/accounts/search","/accounts/active","/accounts/deleted","/roles/update" +
-            "/roles/deleted"};
+            "/roles/deleted","/category/**"};
     @Autowired
     CustomJwtDecoder customJwtDecoder;
     @Bean

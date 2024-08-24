@@ -13,6 +13,7 @@ public enum ErrorCode {
     USERNAME_INVALID(400,"Username needs to be between 5 and 18 characters."),
     PASSWORD_INVALID(400,"Password needs to be between 5 and 18 characters."),
     PHONENUMBER_INVALID(400,"Phone needs to be 10 characters"),
+    CATEGORY_IS_EXIST(400,"Category is exits"),
 
     UNAUTHORIZED(401, "Unauthorized"),
 
@@ -23,6 +24,7 @@ public enum ErrorCode {
     ACCOUNT_NOT_FOUND(404,"Account not found"),
     USER_NOT_FOUND(404,"Account not found"),
     ROLE_NOT_FOUND(404,"Role not found"),
+    CATEGORY_NOT_FOUND(400,"Category not found"),
     ITEM_NOT_FOUND(404,"Item not found")
 
 
