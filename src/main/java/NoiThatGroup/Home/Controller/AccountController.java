@@ -50,7 +50,7 @@ public class AccountController {
                 .build();
     }
 
-    @DeleteMapping("/deleted")
+    @DeleteMapping
     ApiResponses<String> deletedAccount(@RequestBody IdRequest id){
         accountService.deletedAccountById(id.getId());
         return ApiResponses.<String>builder().result("success").build();
@@ -63,7 +63,7 @@ public class AccountController {
                 .build();
     }
 
-    @PutMapping("/update")
+    @PutMapping
     ApiResponses<Boolean> updatePassword(@RequestBody PasswordRequest passwordRequest) throws ParseException, JOSEException {
         emailService.saveAccount(passwordRequest);
         return ApiResponses.<Boolean>builder()

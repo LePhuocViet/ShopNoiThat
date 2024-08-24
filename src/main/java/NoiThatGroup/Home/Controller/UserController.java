@@ -21,7 +21,7 @@ public class UserController {
                 .result(userService.createUser(signRequest))
                 .build();
     }
-    @PutMapping("/update")
+    @PutMapping
     ApiResponses<UserRespone> updateUser(@RequestBody UserRequest userRequest){
         return ApiResponses.<UserRespone>builder()
                 .result(userService.updateUser(userRequest))

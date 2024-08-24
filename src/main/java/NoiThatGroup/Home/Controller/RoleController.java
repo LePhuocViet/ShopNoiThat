@@ -14,13 +14,13 @@ public class RoleController {
 
     @Autowired
     RoleService roleService;
-    @PutMapping("/update")
+    @PutMapping
     ApiResponses<String> updateRole(@RequestBody RoleRequest roleRequest){
         roleService.updateRole(roleRequest);
         return ApiResponses.<String>builder().result("success").build();
     }
 
-    @DeleteMapping("/deleted")
+    @DeleteMapping
     ApiResponses<String> deletedRole(@RequestBody RoleRequest roleRequest){
         roleService.deletedRole(roleRequest);
         return ApiResponses.<String>builder().result("success").build();
