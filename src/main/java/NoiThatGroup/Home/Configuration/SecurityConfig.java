@@ -24,20 +24,22 @@ public class SecurityConfig {
 
     @NonFinal
     protected static final String SIGNER_KEY="630F20D84D4187F778E537CD0AE9582D0DB5DA98057668461651A928F3E3A0CF6C1E205D3A8B7E24BB767357DFAF39C264EA";
-    private String[] PUBLIC_ENPOINT={"/users","/auth/login","/auth/refresh","/auth/forgot","/auth/send","/accounts/update"};
-    private String[] PUBLIC_ENPOINT_GET={"/auth/verify","/auth/change"};
-    private String[] USER_ENPOINT={"/auth/logout","/auth/introspect","/account/myinf","/users/update"};
-    private String[] ADMIN_ENPOINT={"/accounts","/accounts/search","/accounts/active","/accounts/deleted","/roles/update" +
-            "/roles/deleted","/category/**"};
+    private String[] PUBLIC_ENDPOINT_POST={"/users","/auth/login","/auth/refresh","/auth/forgot","/auth/send","/accounts/update"};
+    private String[] PUBLIC_ENDPOINT_GET={"/auth/verify","/auth/change","/category"};
+    private String[] USER_ENDPOINT={"/auth/logout","/auth/introspect","/account/myinf","/users/update"};
+    private String[] ADMIN_ENDPOINT={"/accounts","/accounts/search","/accounts/active","/accounts/deleted","/roles/update" +
+            "/roles/deleted"};
+
     @Autowired
     CustomJwtDecoder customJwtDecoder;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
-            request .requestMatchers(HttpMethod.POST,PUBLIC_ENPOINT).permitAll()
-                    .requestMatchers(HttpMethod.GET,PUBLIC_ENPOINT_GET).permitAll()
-                    .requestMatchers(ADMIN_ENPOINT).hasRole("ADMIN")
-                    .requestMatchers(USER_ENPOINT).hasRole("USER")
+            request
+                    .requestMatchers(HttpMethod.POST,PUBLIC_ENDPOINT_POST).permitAll()
+                    .requestMatchers(HttpMethod.GET,PUBLIC_ENDPOINT_GET).permitAll()
+                    .requestMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
+                    .requestMatchers(USER_ENDPOINT).hasRole("USER")
                     .anyRequest().authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 ->

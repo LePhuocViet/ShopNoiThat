@@ -8,6 +8,8 @@ import NoiThatGroup.Home.Service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/category")
 public class CategoryController {
@@ -15,10 +17,25 @@ public class CategoryController {
     @Autowired
     CategoryService categoryService;
 
+
+    @GetMapping
+    ApiResponses<List<Category>> getCategory(){
+        return  ApiResponses.<List<Category>>builder()
+                .result(categoryService.getCategory())
+                .build();
+    }
+
+    @DeleteMapping
+    ApiResponses<Boolean> deletedCategory(@RequestBody CategoryRequest categoryRequest){
+        categoryService.deletedCategory(categoryRequest.getName());
+        return  ApiResponses.<Boolean>builder()
+                .result(true)
+                .build();
+    }
     @PostMapping
     ApiResponses<String> createCategory(@RequestBody CategoryRequest categoryRequest){
 
-      return  ApiResponses.<String>builder()
+        return  ApiResponses.<String>builder()
                 .result("Category: "  + categoryService.createCategory(categoryRequest.getName()))
                 .build();
     }
