@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/items")
@@ -16,6 +17,22 @@ public class ItemController {
 
     @Autowired
     ItemService itemService;
+
+
+    @GetMapping
+    ApiResponses<List<Item>> getItem(){
+        return ApiResponses.<List<Item>>builder()
+                .result(itemService.getItem())
+                .build();
+    }
+
+    @GetMapping("/find")
+    ApiResponses<Item> findItemById(@RequestParam("id") String id){
+        return ApiResponses.<Item>builder()
+                .result(itemService.findItemById(id))
+                .build();
+
+    }
 
     @PostMapping
     ApiResponses<Item> createItem(@RequestParam("name") String name,
@@ -44,5 +61,17 @@ public class ItemController {
                 .result(item)
                 .build();
     }
+
+    @DeleteMapping
+    @GetMapping("/find")
+    ApiResponses<Boolean> deletedItem(@RequestParam("id") String id){
+        itemService.deletedItem(id);
+        return ApiResponses.<Boolean>builder()
+                .result(true)
+                .build();
+
+    }
+
+
 
 }

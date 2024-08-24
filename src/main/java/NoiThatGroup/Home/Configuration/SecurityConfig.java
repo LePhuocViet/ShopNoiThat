@@ -24,7 +24,7 @@ public class SecurityConfig {
 
     @NonFinal
     protected static final String SIGNER_KEY="630F20D84D4187F778E537CD0AE9582D0DB5DA98057668461651A928F3E3A0CF6C1E205D3A8B7E24BB767357DFAF39C264EA";
-    private String[] PUBLIC_ENDPOINT_GET={"/category"};
+    private String[] PUBLIC_ENDPOINT_GET={"/category","/items","/items/find"};
     private String[] PUBLIC_ENDPOINT_POST={"/auth/login","/auth/introspect","/auth/logout","/auth/refresh" +
             "/auth/send","/auth/forgot"};
     private String[] USER_ENDPOINT={"/users","/accounts/myinf"};
