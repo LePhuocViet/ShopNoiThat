@@ -2,7 +2,6 @@ package NoiThatGroup.Home.Controller;
 
 import NoiThatGroup.Home.Dto.request.AccountRequest;
 import NoiThatGroup.Home.Dto.request.EmailRequest;
-import NoiThatGroup.Home.Dto.request.PasswordRequest;
 import NoiThatGroup.Home.Dto.request.TokenRequest;
 import NoiThatGroup.Home.Dto.respone.ApiResponses;
 import NoiThatGroup.Home.Dto.respone.AuthenticationResponses;
@@ -58,9 +57,9 @@ public class AuthController {
     }
 
     @PostMapping("/send")
-    ApiResponses<Boolean> sendEmail(@RequestBody EmailRequest emailRequest) throws ParseException, JOSEException {
+    ApiResponses<Boolean> sendEmail(@RequestBody TokenRequest tokenRequest) throws ParseException, JOSEException {
         return ApiResponses.<Boolean>builder()
-                .result(emailService.sendMail(emailRequest))
+                .result(emailService.sendMail(tokenRequest))
                 .build();
 
     }
@@ -69,24 +68,24 @@ public class AuthController {
     ApiResponses<Boolean> confirm(@RequestParam("code") String token) throws ParseException, JOSEException {
         System.out.println(1);
         return ApiResponses.<Boolean>builder()
-                .result(emailService.confirmEmail(new EmailRequest(token)))
+                .result(emailService.confirmEmail(new TokenRequest(token)))
                 .build();
 
     }
     @PostMapping("/forgot")
-    ApiResponses<Boolean> sendEmailForgot(@RequestBody PasswordRequest passwordRequest) throws ParseException, JOSEException {
+    ApiResponses<Boolean> sendEmailForgot(@RequestBody EmailRequest emailRequest) throws ParseException, JOSEException {
 
         return ApiResponses.<Boolean>builder()
-                .result( emailService.sendMailPassword(passwordRequest))
+                .result( emailService.sendMailPassword(emailRequest))
                 .build();
 
     }
 
     @GetMapping("/change")
-    ApiResponses<Boolean> confirmMailPassword(@RequestParam("code") String token ) throws ParseException, JOSEException {
+    ApiResponses<Boolean> showFormChange(@RequestParam("code") String token ) throws ParseException, JOSEException {
 
         return ApiResponses.<Boolean>builder()
-                .result( emailService.confirmMailPassword(new EmailRequest(token)))
+                .result( emailService.confirmMailPassword(new TokenRequest(token)))
                 .build();
 
     }

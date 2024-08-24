@@ -1,6 +1,7 @@
 package NoiThatGroup.Home.Service;
 
 import NoiThatGroup.Home.Dto.request.AccountRequest;
+import NoiThatGroup.Home.Dto.request.PasswordRequest;
 import NoiThatGroup.Home.Dto.respone.AccountResponses;
 import NoiThatGroup.Home.Dto.respone.UserRespone;
 import NoiThatGroup.Home.Enity.Account;
@@ -21,6 +22,7 @@ public interface AccountService {
     boolean active(String id);
 
     UserRespone getMyInf();
+
 
 
 

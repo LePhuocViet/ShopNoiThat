@@ -2,6 +2,7 @@ package NoiThatGroup.Home.Service.Implement;
 
 import NoiThatGroup.Home.Dto.request.EmailRequest;
 import NoiThatGroup.Home.Dto.request.PasswordRequest;
+import NoiThatGroup.Home.Dto.request.TokenRequest;
 import NoiThatGroup.Home.Enity.Account;
 import NoiThatGroup.Home.Enity.EmailSender;
 import NoiThatGroup.Home.Enity.User;
@@ -22,8 +23,9 @@ import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
@@ -50,12 +52,12 @@ public class EmailImplement implements EmailService {
     protected static final String SIGNER_KEY="630F20D84D4187F778E537CD0AE9582D0DB5DA98057668461651A928F3E3A0CF6C1E205D3A8B7E24BB767357DFAF39C264EA";
 
     @Override
-    public boolean sendMail(EmailRequest emailRequest) throws JOSEException, ParseException {
-        if(!verifyToken(emailRequest.getToken())){
+    public boolean sendMail(TokenRequest tokenRequest) throws JOSEException, ParseException {
+        if(!verifyToken(tokenRequest.getToken())){
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
-        SignedJWT signedJWT = SignedJWT.parse(emailRequest.getToken());
+        SignedJWT signedJWT = SignedJWT.parse(tokenRequest.getToken());
         var username = signedJWT.getJWTClaimsSet().getSubject();
         var account = accountRepository.findAccountByUsername(username);
         if(account == null) throw new AppException(ErrorCode.ACCOUNT_NOT_FOUND);
@@ -92,17 +94,17 @@ public class EmailImplement implements EmailService {
     }
 
     @Override
-    public boolean confirmEmail(EmailRequest emailRequest) throws ParseException, JOSEException {
-        var verify = verifyToken(emailRequest.getToken());
+    public boolean confirmEmail(TokenRequest tokenRequest) throws ParseException, JOSEException {
+        var verify = verifyToken(tokenRequest.getToken());
         if(!verify) throw new AppException(ErrorCode.UNAUTHORIZED);
-        SignedJWT signedJWT = SignedJWT.parse(emailRequest.getToken());
+        SignedJWT signedJWT = SignedJWT.parse(tokenRequest.getToken());
         JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
         var object = jwtClaimsSet.getClaim("active");
         if (object == null) throw new AppException(ErrorCode.UNAUTHORIZED);
         var account = accountRepository.findAccountByUsername(signedJWT.getJWTClaimsSet().getSubject());
         Optional<EmailSender> emailSender = emailRepository.findById(account.getId());
         if(emailSender.isEmpty()) throw new AppException(ErrorCode.CODE_EXPIRED);
-        if (!emailRequest.getToken().equals(emailSender.get().getToken())) throw new AppException(ErrorCode.UNAUTHORIZED);
+        if (!tokenRequest.getToken().equals(emailSender.get().getToken())) throw new AppException(ErrorCode.UNAUTHORIZED);
         account.setActive(true);
         accountRepository.save(account);
         emailRepository.delete(emailSender.get());
@@ -111,9 +113,9 @@ public class EmailImplement implements EmailService {
     }
 
     @Override
-    public boolean sendMailPassword(PasswordRequest passwordRequest) throws ParseException, JOSEException {
-        if (!userRepository.existsByEmail(passwordRequest.getEmail())) throw new AppException(ErrorCode.EMAIL_NOT_FOUND);
-        User user = userRepository.findUserByEmail(passwordRequest.getEmail());
+    public boolean sendMailPassword(EmailRequest emailRequest) throws ParseException, JOSEException {
+        if (!userRepository.existsByEmail(emailRequest.getEmail())) throw new AppException(ErrorCode.EMAIL_NOT_FOUND);
+        User user = userRepository.findUserByEmail(emailRequest.getEmail());
         if (user == null) throw new AppException(ErrorCode.EMAIL_NOT_FOUND);
         Account account = accountRepository.findAccountById(user.getAccount().getId());
 
@@ -151,20 +153,35 @@ public class EmailImplement implements EmailService {
     }
 
     @Override
-    public boolean confirmMailPassword(EmailRequest emailRequest) throws ParseException, JOSEException {
-        var verify = verifyToken(emailRequest.getToken());
+    public boolean confirmMailPassword(TokenRequest tokenRequest) throws ParseException, JOSEException {
+        var verify = verifyToken(tokenRequest.getToken());
         if(!verify) throw new AppException(ErrorCode.UNAUTHORIZED);
-        SignedJWT signedJWT = SignedJWT.parse(emailRequest.getToken());
+        SignedJWT signedJWT = SignedJWT.parse(tokenRequest.getToken());
         JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
         var object = jwtClaimsSet.getClaim("forgot");
         if (object == null) throw new AppException(ErrorCode.UNAUTHORIZED);
         var account = accountRepository.findAccountByUsername(signedJWT.getJWTClaimsSet().getSubject());
         Optional<EmailSender> emailSender = emailRepository.findById(account.getId());
         if(emailSender.isEmpty()) throw new AppException(ErrorCode.CODE_EXPIRED);
-        if (!emailRequest.getToken().equals(emailSender.get().getToken())) throw new AppException(ErrorCode.UNAUTHORIZED);
-        account.setActive(true);
-        accountRepository.save(account);
+        if (!tokenRequest.getToken().equals(emailSender.get().getToken())) throw new AppException(ErrorCode.UNAUTHORIZED);
+
+
         emailRepository.delete(emailSender.get());
+        return true;
+    }
+
+    @Override
+    public boolean saveAccount(PasswordRequest passwordRequest) throws ParseException, JOSEException {
+        if(!confirmMailPassword(new TokenRequest(passwordRequest.getToken()))) throw new AppException(ErrorCode.UNAUTHORIZED);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        if(!passwordRequest.getPassword().equals(passwordRequest.getRepassword()))
+            throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
+
+        SignedJWT signedJWT = SignedJWT.parse(passwordRequest.getToken());
+        var username = signedJWT.getJWTClaimsSet().getSubject();
+        var account = accountRepository.findAccountByUsername(username);
+        account.setPassword(passwordEncoder.encode(passwordRequest.getPassword()));
+        accountRepository.save(account);
         return true;
     }
 

@@ -9,11 +9,13 @@ import java.text.ParseException;
 
 public interface EmailService {
 
-    boolean sendMail(EmailRequest emailRequest) throws JOSEException, ParseException;
+    boolean sendMail(TokenRequest tokenRequest) throws JOSEException, ParseException;
 
-    boolean confirmEmail(EmailRequest emailRequest) throws ParseException, JOSEException;
+    boolean confirmEmail(TokenRequest tokenRequest) throws ParseException, JOSEException;
 
-    boolean sendMailPassword(PasswordRequest passwordRequest) throws ParseException, JOSEException;
+    boolean sendMailPassword(EmailRequest emailRequest) throws ParseException, JOSEException;
 
-    boolean confirmMailPassword(EmailRequest emailRequest) throws ParseException, JOSEException;
+    boolean confirmMailPassword(TokenRequest tokenRequest) throws ParseException, JOSEException;
+
+    boolean saveAccount(PasswordRequest passwordRequest) throws ParseException, JOSEException;
 }

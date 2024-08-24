@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class EmailRequest {
 
-    String token;
+    String email;
 }
