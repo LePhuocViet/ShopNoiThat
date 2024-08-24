@@ -23,15 +23,16 @@ public class Item {
 
     private String name;
 
-    private String img;
+    @Lob
+    private byte[] img;
 
     private String detail;
 
     private String material;
 
-    private boolean rate;
+    private int rate;
 
-    private boolean weight;
+    private double weight;
 
     private String status;
 

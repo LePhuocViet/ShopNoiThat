@@ -28,7 +28,7 @@ public class SecurityConfig {
     private String[] PUBLIC_ENDPOINT_POST={"/auth/login","/auth/introspect","/auth/logout","/auth/refresh" +
             "/auth/send","/auth/forgot"};
     private String[] USER_ENDPOINT={"/users","/accounts/myinf"};
-    private String[] ADMIN_ENDPOINT={"/accounts","/accounts/search","/accounts/active","/roles","/category"};
+    private String[] ADMIN_ENDPOINT={"/accounts","/accounts/search","/accounts/active","/roles","/category","/items"};
 
     @Autowired
     CustomJwtDecoder customJwtDecoder;
