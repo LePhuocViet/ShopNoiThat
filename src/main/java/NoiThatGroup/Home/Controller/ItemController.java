@@ -1,5 +1,6 @@
 package NoiThatGroup.Home.Controller;
 
+import NoiThatGroup.Home.Dto.request.IdRequest;
 import NoiThatGroup.Home.Dto.request.ItemRequest;
 import NoiThatGroup.Home.Dto.respone.ApiResponses;
 import NoiThatGroup.Home.Enity.Item;
@@ -62,16 +63,43 @@ public class ItemController {
                 .build();
     }
 
+    @PutMapping
+    ApiResponses<Item> updateItem(@RequestParam("id") String id,
+                                     @RequestParam("name") String name,
+                                  @RequestParam("img") MultipartFile img,
+                                  @RequestParam("detail") String detail,
+                                  @RequestParam("material") String material,
+                                  @RequestParam("weight") double weight,
+                                  @RequestParam("status") String status,
+                                  @RequestParam("inventory") int inventory,
+                                  @RequestParam("price") int price,
+                                  @RequestParam("category") String category) throws IOException {
+        byte[] imgByte = img.getBytes();
+        Item item = itemService.updateItem(new ItemRequest().builder()
+                        .id(id)
+                .name(name)
+                .img(imgByte)
+                .detail(detail)
+                .material(material)
+                .weight(weight)
+                .status(status)
+                .inventory(inventory)
+                .price(price)
+                .category(category)
+                .build());
+
+        return ApiResponses.<Item>builder()
+                .result(item)
+                .build();
+    }
     @DeleteMapping
-    @GetMapping("/find")
-    ApiResponses<Boolean> deletedItem(@RequestParam("id") String id){
-        itemService.deletedItem(id);
+    ApiResponses<Boolean> deletedItem(@RequestBody IdRequest idRequest){
+        itemService.deletedItem(idRequest.getId());
         return ApiResponses.<Boolean>builder()
                 .result(true)
                 .build();
 
     }
-
 
 
 }

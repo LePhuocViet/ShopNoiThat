@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ItemRequest {
+    String id;
     private String name;
 
     @Lob

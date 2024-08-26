@@ -3,6 +3,7 @@ package NoiThatGroup.Home.Controller;
 import NoiThatGroup.Home.Dto.request.CategoryRequest;
 import NoiThatGroup.Home.Dto.respone.ApiResponses;
 import NoiThatGroup.Home.Enity.Category;
+import NoiThatGroup.Home.Enity.Item;
 import NoiThatGroup.Home.Repository.CategoryRepository;
 import NoiThatGroup.Home.Service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,12 @@ public class CategoryController {
                 .build();
     }
 
+    @GetMapping("/find")
+    ApiResponses<List<Item>> getCategoryByName(@RequestParam("name") String name){
+        return ApiResponses.<List<Item>>builder()
+                .result(categoryService.getItemByCategory(name))
+                .build();
+    }
     @DeleteMapping
     ApiResponses<Boolean> deletedCategory(@RequestBody CategoryRequest categoryRequest){
         categoryService.deletedCategory(categoryRequest.getName());

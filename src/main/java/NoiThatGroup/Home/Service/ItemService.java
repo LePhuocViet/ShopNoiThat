@@ -16,4 +16,6 @@ Item findItemById(String id);
 
 boolean deletedItem(String id);
 
+
+Item updateItem(ItemRequest itemRequest);
 }
