@@ -33,10 +33,6 @@ public class Cart {
     @JoinColumn(name = "shopping_id")
     private Shopping shopping;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
     @ManyToMany
     private Set<Item> item;
 }

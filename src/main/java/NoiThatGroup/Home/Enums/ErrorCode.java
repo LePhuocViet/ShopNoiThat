@@ -25,8 +25,8 @@ public enum ErrorCode {
     USER_NOT_FOUND(404,"Account not found"),
     ROLE_NOT_FOUND(404,"Role not found"),
     CATEGORY_NOT_FOUND(400,"Category not found"),
-    ITEM_NOT_FOUND(404,"Item not found")
-
+    ITEM_NOT_FOUND(404,"Item not found"),
+    CART_NOT_FOUND(404,"Cart not found")
 
 
 

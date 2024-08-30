@@ -40,9 +40,10 @@ public class Item {
 
     private int price;
 
-    @OneToMany(mappedBy = "item")
-    private List<Comment> comments;
 
     @ManyToMany
     private Set<Category> categories;
+
+    @OneToMany(mappedBy = "item")
+    private List<Comment> comments;
 }

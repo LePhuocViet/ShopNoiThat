@@ -12,4 +12,6 @@ public interface ItemRepository extends JpaRepository<Item, String> {
 
     List<Item> findItemByCategories_Name(String name);
 
+
+
 }
